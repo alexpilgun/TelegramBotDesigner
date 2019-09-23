@@ -135,7 +135,7 @@ namespace ExpenseTrackingBot
                         {
                             new Message()
                             {
-                                Content = "Что именно будет менять в категориях?",
+                                Content = "Что именно будем менять в категориях?",
                                 Type = MessageType.sendMessage
                             },
                         }
@@ -179,7 +179,12 @@ namespace ExpenseTrackingBot
                             },
                             new Message()
                             {
-                                Content = "Какую категорию изменим?",
+                                Content = "",
+                                Type = MessageType.saveUserInput
+                            },
+                            new Message()
+                            {
+                                Content = "",
                                 Type = MessageType.Custom
                             },
                         }
@@ -193,6 +198,11 @@ namespace ExpenseTrackingBot
                             {
                                 Content = "Какую категорию удалим?",
                                 Type = MessageType.sendMessage
+                            },
+                            new Message()
+                            {
+                                Content = "",
+                                Type = MessageType.saveUserInput
                             },
                             new Message()
                             {

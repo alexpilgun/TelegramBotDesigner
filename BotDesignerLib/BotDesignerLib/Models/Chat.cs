@@ -24,6 +24,7 @@ namespace BotDesignerLib
         public DataContext DataContext { get; set; }
         public bool WaitForUserTransition { get; set; }
         public bool HasBeenAtLastMessage { get; set; }
+        public bool ProcessedUserInput { get; set; }
 
         public ChatState(Chat newChat)
         {

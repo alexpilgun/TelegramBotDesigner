@@ -25,6 +25,11 @@ namespace BotDesignerLib
 
             do
             {
+                if(chat.State.ProcessedUserInput)
+                {
+                    userInput = null;
+                }
+
                 wasProcessed = ProcessChatState(chat, userInput, botClient, schema);
                 if(!wasProcessed)
                 {
@@ -34,6 +39,7 @@ namespace BotDesignerLib
 
                 if(chat.State.CurrentMessage.Type == MessageType.saveUserInput || chat.State.WaitForUserTransition)
                 {
+                    chat.State.ProcessedUserInput = false;
                     break;
                 }
             }
@@ -44,6 +50,11 @@ namespace BotDesignerLib
 
         public static bool ProcessChatState(Chat chat, string userInput, TelegramBotClient botClient, Schema schema)
         {
+            if (chat.State.WaitForUserTransition)
+            {
+                return true;
+            }
+
             Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup customKeyboard = null;
             if ( chat.State.CurrentMessage == chat.State.CurrentMessageBlock.Messages.Last() )
             {
@@ -68,6 +79,7 @@ namespace BotDesignerLib
                     return true;
                 case MessageType.saveUserInput:
                     TelegramActions.sendMessage(chat.chatId, "Допустим, что сохранили:" + userInput, customKeyboard, botClient);
+                    chat.State.ProcessedUserInput = true;
                     return true;
                 case MessageType.pause:
                     TelegramActions.sendMessage(chat.chatId, "Допустим, что тут будет пауза.", customKeyboard, botClient);
@@ -104,6 +116,7 @@ namespace BotDesignerLib
                 {
                     chat.State.CurrentMessageBlock = allPossibleTransitions.First();
                     chat.State.CurrentMessage = allPossibleTransitions.First().Messages.First();
+                    chat.State.ProcessedUserInput = true;
                     return true;
                 }
                 
@@ -125,6 +138,7 @@ namespace BotDesignerLib
                         chat.State.CurrentMessage = userDefinedSteps.First().Messages.First();
                         chat.State.WaitForUserTransition = false;
                         chat.State.HasBeenAtLastMessage = false;
+                        chat.State.ProcessedUserInput = true;
                         return true;
                     default:
                         throw new ApplicationException("2 or more user-defined transitions exist.");
