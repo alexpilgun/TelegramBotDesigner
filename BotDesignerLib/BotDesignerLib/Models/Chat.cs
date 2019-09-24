@@ -29,7 +29,7 @@ namespace BotDesignerLib
         public ChatState(Chat newChat)
         {
             Chat = newChat;
-            DataContext = new DataContext();
+            DataContext = (DataContext)Activator.CreateInstance(typeof(DataContext));
             WaitForUserTransition = false;
         }
     }
