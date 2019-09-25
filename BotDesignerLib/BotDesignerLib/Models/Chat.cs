@@ -9,10 +9,10 @@ namespace BotDesignerLib
         
         public ChatState State { get; set; }
 
-        public Chat(long chatIdInput)
+        public Chat(long chatIdInput, IDataContext domainDataContextType)
         {
             chatId = chatIdInput;
-            State = new ChatState(this);
+            State = new ChatState(this, domainDataContextType);
         }
     }
 
@@ -21,21 +21,21 @@ namespace BotDesignerLib
         public Chat Chat { get; set; }
         public MessageBlock CurrentMessageBlock { get; set; }
         public Message CurrentMessage { get; set; }
-        public DataContext DataContext { get; set; }
+        public IDataContext DataContext { get; set; }
         public bool WaitForUserTransition { get; set; }
         public bool HasBeenAtLastMessage { get; set; }
         public bool ProcessedUserInput { get; set; }
 
-        public ChatState(Chat newChat)
+        public ChatState(Chat newChat, IDataContext domainDataContextType)
         {
             Chat = newChat;
-            DataContext = (DataContext)Activator.CreateInstance(typeof(DataContext));
+            DataContext = domainDataContextType;
             WaitForUserTransition = false;
         }
     }
 
-    public class DataContext
+    public interface IDataContext
     {
-        public DataContext() { }
+
     }
 }

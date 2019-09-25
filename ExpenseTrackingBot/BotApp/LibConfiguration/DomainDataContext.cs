@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BotDesignerLib;
 
-namespace ExpenseTrackingBot.BotApp
+namespace ExpenseTrackingBot
 {
-    public class DomainDataContext: BotDesignerLib.DataContext
+    public class DomainDataContext: IDataContext
     {
         public Guid Id { get; }
         public string UserId { get; set; }
@@ -20,6 +21,8 @@ namespace ExpenseTrackingBot.BotApp
             Categories = new List<ExpenseCategory>();
             GSheetsConnector = new GoogleSheetsConnector();
         }
+
+        public DomainDataContext() { }
 
 }
 

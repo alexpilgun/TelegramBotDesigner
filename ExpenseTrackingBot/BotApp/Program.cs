@@ -13,40 +13,33 @@ namespace ExpenseTrackingBot
 {
     class Program
     {
-        public static TelegramBotClient botClient;
-        public static DbConnector dbConnector;
-        public static Schema schema;
+        public static LibConfigurationModule config { get; set; }
 
         static void Main(string[] args)
         {
-            dbConnector = new DbConnector();
-            SchemaInstance currentSchemaInstance = new SchemaInstance();
-            schema = currentSchemaInstance.schema;
+            config = new LibConfigurationModule()
+            {
+                DbConnector = new DbConnector(),
+                Schema = new SchemaInstance().schema,
+                BotClient = new TelegramBotClient("713947361:AAF9PylFSAAd3Bi1xKseyEaoPukwIw1FJwk", new HttpToSocks5Proxy("127.0.0.1", 9054)),
+                DomainDataContextType = typeof(DomainDataContext)
+            };
+        
+            var initializationStatus = config.BotClient.TestApiAsync().Result;
 
-            botClient = new TelegramBotClient(
-                "713947361:AAF9PylFSAAd3Bi1xKseyEaoPukwIw1FJwk", new HttpToSocks5Proxy("127.0.0.1", 9054));
-    
-            var initializationStatus = botClient.TestApiAsync().Result;
-
-            botClient.OnMessage += Bot_OnMessage;
-            botClient.StartReceiving();
+            config.BotClient.OnMessage += Bot_OnMessage;
+            config.BotClient.StartReceiving();
 
             while (true)
             {
-                Console.WriteLine(ChatStats.getReportOnCurrentChats(dbConnector));
+                Console.WriteLine(ChatStats.getReportOnCurrentChats(config.DbConnector));
                 Thread.Sleep(10000);
             }
         }
 
         static async void Bot_OnMessage(object sender, MessageEventArgs e)
         {
-            SchemaWalker.WalkThroughSchema(e.Message.Chat.Id, e.Message.Text, botClient, schema, dbConnector);
-
-            //await botClient.SendTextMessageAsync(
-            //    chatId: e.Message.Chat.Id,
-            //    text: "testing buttons",
-            //    replyMarkup: createCustomKeyboard()
-            //    );
+            SchemaWalker.WalkThroughSchema(e.Message.Chat.Id, e.Message.Text, config);
         }
     }
 }
