@@ -44,4 +44,17 @@ namespace BotDesignerLib
             }
         }
     }
+
+    public class LibActionInput
+    {
+        public string userInput { get; set; }
+        public IDataContext chatDataContext { get; set; }
+        public LibActionInput() { }
+    }
+
+    public class LibActionResult
+    {
+        public bool Status { get; set; }
+        public LibActionResult() { }
+    }
 }

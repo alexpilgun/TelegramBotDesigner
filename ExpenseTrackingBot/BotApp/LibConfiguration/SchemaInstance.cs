@@ -22,7 +22,7 @@ namespace ExpenseTrackingBot
         private List<MessageBlock> createMessageBlocks ()
         {
             var messageBlocks = new List<MessageBlock>();
-
+            
             messageBlocks.AddRange(
                 new List<MessageBlock> ()
                 {
@@ -35,6 +35,21 @@ namespace ExpenseTrackingBot
                             {
                                 Content = "Привет! Этот бот поможет тебе записывать твои расходы и потом анализировать их",
                                 Type = MessageType.sendMessage
+                            },
+                            new Message()
+                            {
+                                Content = "Кcтати, как тебя зовут?",
+                                Type = MessageType.sendMessage
+                            },
+                            new Message()
+                            {
+                                Content = "",
+                                Type = MessageType.saveUserInput
+                            },
+                            new Message()
+                            {
+                                CustomMethod = DomainActions.SaveUserName,
+                                Type = MessageType.Custom
                             },
                             new Message()
                             {

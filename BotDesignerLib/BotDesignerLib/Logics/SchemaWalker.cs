@@ -86,9 +86,16 @@ namespace BotDesignerLib
                     TelegramActions.sendMessage(chat.chatId, "Допустим, что тут будет пауза.", customKeyboard, config.BotClient);
                     return true;
                 case MessageType.Custom:
-                    // ToDo: call custom method (with reflections?)
-                    TelegramActions.sendMessage(chat.chatId, "Выполнилась кастомная хрень.", customKeyboard, config.BotClient);
-                    return true;
+                    if(chat.State.CurrentMessage.CustomMethod != null)
+                    {
+                        chat.State.CurrentMessage.CustomMethod(userInput, chat.State.DataContext);
+                        return true;
+                    }
+                    else
+                    {
+                        TelegramActions.sendMessage(chat.chatId, "Выполнилась кастомная хрень.", customKeyboard, config.BotClient);
+                        return true;
+                    }
                 default:
                     return false;
             }

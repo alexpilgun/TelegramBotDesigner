@@ -48,6 +48,7 @@ namespace BotDesignerLib
         public string Id { get; }
         public string Content { get; set; }
         public string PropertyName { get; set; }
+        public Func<string, IDataContext, LibActionResult> CustomMethod;
         public MessageType Type { get; set; }
 
         public Message()

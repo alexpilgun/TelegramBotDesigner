@@ -9,6 +9,7 @@ namespace ExpenseTrackingBot
     {
         public Guid Id { get; }
         public string UserId { get; set; }
+        public string UserName { get; set; }
         public List<Expense> Expenses { get; set; }
         public List<ExpenseCategory> Categories { get; set; }
         public GoogleSheetsConnector GSheetsConnector { get; set; }
