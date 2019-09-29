@@ -43,13 +43,16 @@ namespace ExpenseTrackingBot
                             },
                             new Message()
                             {
-                                Content = "",
+                                PropertySetter = (i, chat) => ((DomainDataContext)chat.State.DataContext).UserName = i,
+                                //CustomMethod = DomainActions.SaveUserName,
                                 Type = MessageType.saveUserInput
                             },
                             new Message()
                             {
-                                CustomMethod = DomainActions.SaveUserName,
-                                Type = MessageType.Custom
+                                Content = "",
+                                Type = MessageType.sendMessage
+                                //CustomMethod = DomainActions.SendUserName,
+                                //Type= MessageType.Custom
                             },
                             new Message()
                             {

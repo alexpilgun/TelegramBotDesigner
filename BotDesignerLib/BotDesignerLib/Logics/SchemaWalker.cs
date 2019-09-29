@@ -79,7 +79,16 @@ namespace BotDesignerLib
                     TelegramActions.sendImage(chat.chatId, chat.State.CurrentMessage.Content, customKeyboard, config.BotClient);
                     return true;
                 case MessageType.saveUserInput:
-                    TelegramActions.sendMessage(chat.chatId, "Допустим, что сохранили:" + userInput, customKeyboard, config.BotClient);
+                    if (chat.State.CurrentMessage.CustomMethod != null)
+                    {
+                        chat.State.CurrentMessage.CustomMethod(userInput, chat);
+                    }
+                    else if(chat.State.CurrentMessage.PropertySetter != null)
+                    {
+                        LibActions.SetDataContextStringProperty(userInput, chat, chat.State.CurrentMessage.PropertySetter);
+                    }
+
+                    //TelegramActions.sendMessage(chat.chatId, "Допустим, что сохранили:" + userInput, customKeyboard, config.BotClient);
                     chat.State.ProcessedUserInput = true;
                     return true;
                 case MessageType.pause:
@@ -88,7 +97,7 @@ namespace BotDesignerLib
                 case MessageType.Custom:
                     if(chat.State.CurrentMessage.CustomMethod != null)
                     {
-                        chat.State.CurrentMessage.CustomMethod(userInput, chat.State.DataContext);
+                        chat.State.CurrentMessage.CustomMethod(userInput, chat);
                         return true;
                     }
                     else

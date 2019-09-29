@@ -7,7 +7,6 @@ namespace BotDesignerLib
     public class Schema
     {
         public string Id { get; }
-
         public List<SchemaStep> Steps {get;set;}
         public string defaultMessageBlock;
 
@@ -47,8 +46,8 @@ namespace BotDesignerLib
     {
         public string Id { get; }
         public string Content { get; set; }
-        public string PropertyName { get; set; }
-        public Func<string, IDataContext, LibActionResult> CustomMethod;
+        public Action<string, Chat> PropertySetter { get; set; }
+        public Func<string, Chat, LibActionResult> CustomMethod {get;set; }
         public MessageType Type { get; set; }
 
         public Message()

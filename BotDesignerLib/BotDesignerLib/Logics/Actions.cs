@@ -45,6 +45,27 @@ namespace BotDesignerLib
         }
     }
 
+    public static class LibActions
+    {
+        public static bool SetDataContextStringProperty(string UserInput, Chat CurrentChat, Action<string, Chat> propertySetter)
+        {
+            if(!String.IsNullOrEmpty(UserInput))
+            {
+                propertySetter(UserInput, CurrentChat);
+            }
+
+            return true;
+        }
+
+        public static bool SetDataContextGenericProperty(string UserInput, Chat CurrentChat, Action<string> propertySetter, Type ModelType)
+        {
+            return true;
+        }
+        // ToDo: 
+        // 1) add methods for other types: numbers(int, decimal), date
+        // 2) Add handling for incorrect input
+    }
+
     public class LibActionInput
     {
         public string userInput { get; set; }

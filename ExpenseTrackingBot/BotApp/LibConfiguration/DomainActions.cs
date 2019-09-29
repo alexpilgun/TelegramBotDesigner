@@ -7,9 +7,20 @@ namespace ExpenseTrackingBot
 {
     public class DomainActions
     {
-        public static LibActionResult SaveUserName(string userInput, IDataContext chatDataContext)
+        // ToDo: Method to get customKeyboard in case action is list in block
+        public static LibActionResult SaveUserName(string userInput, Chat chat)
         {
-            // chatDataContext.UserName = userInput;
+            DomainDataContext chatDomainDataContext = (DomainDataContext)chat.State.DataContext;
+            chatDomainDataContext.UserName = userInput;
+            return new LibActionResult() { Status = true };
+        }
+
+        public static LibActionResult SendUserName(string userInput, Chat chat)
+        {
+            DomainDataContext chatDomainDataContext = (DomainDataContext)chat.State.DataContext;
+            string userName = chatDomainDataContext.UserName;
+            TelegramActions.sendMessage(chat.chatId, userName, null, Program.config.BotClient);
+
             return new LibActionResult() { Status = true };
         }
     }
