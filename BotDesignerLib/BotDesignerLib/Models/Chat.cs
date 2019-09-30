@@ -5,31 +5,35 @@ namespace BotDesignerLib
 {
     public class Chat
     {
-        public readonly long chatId;
-        
-        public ChatState State { get; set; }
+        public readonly long СhatId;
+        public Schema Schema { get; set; }
+        public State State { get; set; }
+        public IDataContext DataContext { get; set; }
 
-        public Chat(long chatIdInput, IDataContext domainDataContextType)
+        public Chat(long chatIdInput, LibConfigurationModule config)
         {
-            chatId = chatIdInput;
-            State = new ChatState(this, domainDataContextType);
+            СhatId = chatIdInput;
+            DataContext = (IDataContext)Activator.CreateInstance(config.DomainDataContextType);
+            Schema = (Schema)Activator.CreateInstance(config.DomainSchemaType);
+            Schema.Chat = this;
+            State = new State(this);
         }
     }
 
-    public class ChatState
+    public class State
     {
         public Chat Chat { get; set; }
-        public MessageBlock CurrentMessageBlock { get; set; }
-        public Message CurrentMessage { get; set; }
-        public IDataContext DataContext { get; set; }
+        public SchemaActionBlock CurrentMessageBlock { get; set; }
+        public SchemaAction CurrentMessage { get; set; }
         public bool WaitForUserTransition { get; set; }
         public bool HasBeenAtLastMessage { get; set; }
         public bool ProcessedUserInput { get; set; }
 
-        public ChatState(Chat newChat, IDataContext domainDataContextType)
+        public State(Chat chat)
         {
-            Chat = newChat;
-            DataContext = domainDataContextType;
+            Chat = chat;
+            CurrentMessageBlock = chat.Schema.Steps.First().FromBlock;
+            CurrentMessage = this.CurrentMessageBlock.Messages.First();
             WaitForUserTransition = false;
         }
     }

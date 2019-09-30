@@ -47,11 +47,11 @@ namespace BotDesignerLib
 
     public static class LibActions
     {
-        public static bool SetDataContextStringProperty(string UserInput, Chat CurrentChat, Action<string, Chat> propertySetter)
+        public static bool SetDataContextStringProperty(string UserInput, Action<string> propertySetter)
         {
             if(!String.IsNullOrEmpty(UserInput))
             {
-                propertySetter(UserInput, CurrentChat);
+                propertySetter(UserInput);
             }
 
             return true;

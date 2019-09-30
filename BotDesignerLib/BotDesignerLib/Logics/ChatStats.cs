@@ -13,7 +13,7 @@ namespace BotDesignerLib
             var currentChats = dbConnector.chats;
             foreach(var c in currentChats)
             {
-                result.Append("ChatId " + c.chatId + " has state " + c.State.CurrentMessageBlock.Name + " & " + c.State.CurrentMessage.Content);
+                result.Append("ChatId " + c.СhatId + " has state " + c.State.CurrentMessageBlock.Name + " & " + c.State.CurrentMessage.Content);
             }
             return result.ToString();
         }

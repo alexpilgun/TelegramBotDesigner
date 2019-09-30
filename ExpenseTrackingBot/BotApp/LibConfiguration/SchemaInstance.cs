@@ -6,274 +6,272 @@ using BotDesignerLib;
 
 namespace ExpenseTrackingBot
 {
-    public class SchemaInstance
+    public class SchemaInstance: Schema
     {
-        public Schema schema { get; }
-
         public SchemaInstance()
         {
-            schema = new Schema("Onboarding");
             var messageBlocks = createMessageBlocks();
             var transitions = createTransitions();
 
-            schema.Steps = createSchemaSteps(messageBlocks, transitions);
+            Steps = createSchemaSteps(messageBlocks, transitions);
         }
 
-        private List<MessageBlock> createMessageBlocks ()
+        private List<SchemaActionBlock> createMessageBlocks ()
         {
-            var messageBlocks = new List<MessageBlock>();
+            var messageBlocks = new List<SchemaActionBlock>();
             
             messageBlocks.AddRange(
-                new List<MessageBlock> ()
+                new List<SchemaActionBlock> ()
                 {
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "Onboarding",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Привет! Этот бот поможет тебе записывать твои расходы и потом анализировать их",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Кcтати, как тебя зовут?",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
-                                PropertySetter = (i, chat) => ((DomainDataContext)chat.State.DataContext).UserName = i,
+                                PropertySetter = i => ((DomainDataContext)Chat.DataContext).UserName = i,
                                 //CustomMethod = DomainActions.SaveUserName,
                                 Type = MessageType.saveUserInput
                             },
-                            new Message()
+                            new SchemaAction()
                             {
-                                Content = "",
+                                //Content = "Your name is: ", //+ ((DomainDataContext)Chat.DataContext).UserName,
+                                TextWithProperties = v => "Your name is: " + ((DomainDataContext)Chat.DataContext).UserName,
                                 Type = MessageType.sendMessage
                                 //CustomMethod = DomainActions.SendUserName,
                                 //Type= MessageType.Custom
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Заноси свои расходы, получай агрегированные отчеты и понимай, на что именно ты тратишь деньги!",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "https://st.kp.yandex.net/images/film_iphone/iphone360_19373.jpg",
                                 Type = MessageType.sendImage
                             }
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "Menu",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Ты находишься в главном меню. Что будешь делать?",
                                 Type = MessageType.sendMessage
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "AddExpense",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Внеси сумму расхода:",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.saveUserInput
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Выбери категорию расхода:",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.saveUserInput
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Ура, расход учтен!",
                                 Type = MessageType.sendMessage
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "PushExpenseToGoogleSheets",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.Custom
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "CancelExpenseCreation",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.Custom
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "Settings",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Что хочешь изменить?",
                                 Type = MessageType.sendMessage
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "ExpenseCategories",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Что именно будем менять в категориях?",
                                 Type = MessageType.sendMessage
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "AddNewExpenseCategory",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Введи название новой категории:",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.saveUserInput
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.Custom
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Ура, категория создана!",
                                 Type = MessageType.sendMessage
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "EditExpenseCategory",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Какую категорию изменим?",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.saveUserInput
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.Custom
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "DeleteExpenseCategory",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Какую категорию удалим?",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.saveUserInput
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Какую категорию удалим?",
                                 Type = MessageType.Custom
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "GoogleSheetsIntegration",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Что именно настроим?",
                                 Type = MessageType.sendMessage
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "SetGoogleSheetId",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Пришли ID Google Sheets, где будут хранится твои расходы.",
                                 Type = MessageType.sendMessage
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.saveUserInput
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Записано!",
                                 Type = MessageType.sendMessage
                             },
                         }
                     },
-                    new MessageBlock()
+                    new SchemaActionBlock()
                     {
                         Name = "GoogleAuthentication",
-                        Messages = new List<Message>()
+                        Messages = new List<SchemaAction>()
                         {
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "",
                                 Type = MessageType.Custom
                             },
-                            new Message()
+                            new SchemaAction()
                             {
                                 Content = "Соединение установлено!",
                                 Type = MessageType.sendMessage
@@ -413,7 +411,7 @@ namespace ExpenseTrackingBot
             return transitions;
         }
 
-        private List<SchemaStep> createSchemaSteps(List<MessageBlock> messageBlocks, List<Transition> transitions)
+        private List<SchemaStep> createSchemaSteps(List<SchemaActionBlock> messageBlocks, List<Transition> transitions)
         {
             var steps = new List<SchemaStep>() { };
             steps.Add(new SchemaStep()

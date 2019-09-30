@@ -10,16 +10,16 @@ namespace ExpenseTrackingBot
         // ToDo: Method to get customKeyboard in case action is list in block
         public static LibActionResult SaveUserName(string userInput, Chat chat)
         {
-            DomainDataContext chatDomainDataContext = (DomainDataContext)chat.State.DataContext;
+            DomainDataContext chatDomainDataContext = (DomainDataContext)chat.DataContext;
             chatDomainDataContext.UserName = userInput;
             return new LibActionResult() { Status = true };
         }
 
         public static LibActionResult SendUserName(string userInput, Chat chat)
         {
-            DomainDataContext chatDomainDataContext = (DomainDataContext)chat.State.DataContext;
+            DomainDataContext chatDomainDataContext = (DomainDataContext)chat.DataContext;
             string userName = chatDomainDataContext.UserName;
-            TelegramActions.sendMessage(chat.chatId, userName, null, Program.config.BotClient);
+            TelegramActions.sendMessage(chat.СhatId, userName, null, Program.config.BotClient);
 
             return new LibActionResult() { Status = true };
         }

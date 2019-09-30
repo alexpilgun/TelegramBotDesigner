@@ -7,21 +7,21 @@ namespace BotDesignerLib
     public class Schema
     {
         public string Id { get; }
+        public Chat Chat;
         public List<SchemaStep> Steps {get;set;}
-        public string defaultMessageBlock;
 
-        public Schema(string defaultBlock)
+        public Schema()
         {
             Id = Guid.NewGuid().ToString("N");
-            defaultMessageBlock = defaultBlock;
         }
     }
-
+    
     public class SchemaStep
     {
+        // ToDo: merge SchemaStep and Transition
         public string Id { get; }
-        public MessageBlock FromBlock { get; set; }
-        public MessageBlock ToBlock { get; set; }
+        public SchemaActionBlock FromBlock { get; set; }
+        public SchemaActionBlock ToBlock { get; set; }
         public Transition Transition { get; set; }
 
         public SchemaStep()
@@ -30,27 +30,28 @@ namespace BotDesignerLib
         }
     }
 
-    public class MessageBlock
+    public class SchemaActionBlock
     {
         public string Id { get; }
         public string Name { get; set; }
-        public List<Message> Messages { get; set; }
+        public List<SchemaAction> Messages { get; set; }
 
-        public MessageBlock()
+        public SchemaActionBlock()
         {
             Id = Guid.NewGuid().ToString("N");
         }
     }
 
-    public class Message
+    public class SchemaAction
     {
         public string Id { get; }
         public string Content { get; set; }
-        public Action<string, Chat> PropertySetter { get; set; }
-        public Func<string, Chat, LibActionResult> CustomMethod {get;set; }
+        public Func<string, string> TextWithProperties { get; set; }
+        public Action<string> PropertySetter { get; set; }
+        public Func<string, LibActionResult> CustomMethod {get;set; }
         public MessageType Type { get; set; }
 
-        public Message()
+        public SchemaAction()
         {
             Id = Guid.NewGuid().ToString("N");
         }

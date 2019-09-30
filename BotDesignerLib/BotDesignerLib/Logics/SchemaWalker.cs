@@ -10,15 +10,11 @@ namespace BotDesignerLib
     {
         public static void WalkThroughSchema(long currentChatId, string userInput, LibConfigurationModule config)
         {
-            Chat chat = config.DbConnector.chats.Where(x => x.chatId == currentChatId).FirstOrDefault();
-
+            Chat chat = config.DbConnector.chats.Where(x => x.СhatId == currentChatId).FirstOrDefault();
+            var v = 5;
             if (chat == null)
             {
-                IDataContext chatDataContext = (IDataContext)Activator.CreateInstance(config.DomainDataContextType);
-                chat = new Chat(currentChatId, chatDataContext);
-                chat.State.CurrentMessageBlock = config.Schema.Steps
-                    .Where(x => x.FromBlock.Name == config.Schema.defaultMessageBlock).Select(x => x.FromBlock).First();
-                chat.State.CurrentMessage = chat.State.CurrentMessageBlock.Messages.First();
+                chat = new Chat(currentChatId, config);
                 config.DbConnector.chats.Add(chat);
             }
 
@@ -59,7 +55,7 @@ namespace BotDesignerLib
             Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup customKeyboard = null;
             if ( chat.State.CurrentMessage == chat.State.CurrentMessageBlock.Messages.Last() )
             {
-                var possibleSteps = config.Schema.Steps.Where(x => x.FromBlock == chat.State.CurrentMessageBlock).ToList();
+                var possibleSteps = chat.Schema.Steps.Where(x => x.FromBlock == chat.State.CurrentMessageBlock).ToList();
                 if(possibleSteps.Count >= 2)
                 {
                     chat.State.WaitForUserTransition = true;
@@ -73,36 +69,43 @@ namespace BotDesignerLib
             switch(chat.State.CurrentMessage.Type)
             {
                 case MessageType.sendMessage:
-                    TelegramActions.sendMessage(chat.chatId, chat.State.CurrentMessage.Content, customKeyboard, config.BotClient);
+                    if(!String.IsNullOrEmpty(chat.State.CurrentMessage.Content))
+                    {
+                        TelegramActions.sendMessage(chat.СhatId, chat.State.CurrentMessage.Content, customKeyboard, config.BotClient);
+                    }
+                    else if(chat.State.CurrentMessage.TextWithProperties != null)
+                    {
+                        TelegramActions.sendMessage(chat.СhatId, chat.State.CurrentMessage.TextWithProperties(userInput), customKeyboard, config.BotClient);
+                    }
                     return true;
                 case MessageType.sendImage:
-                    TelegramActions.sendImage(chat.chatId, chat.State.CurrentMessage.Content, customKeyboard, config.BotClient);
+                    TelegramActions.sendImage(chat.СhatId, chat.State.CurrentMessage.Content, customKeyboard, config.BotClient);
                     return true;
                 case MessageType.saveUserInput:
                     if (chat.State.CurrentMessage.CustomMethod != null)
                     {
-                        chat.State.CurrentMessage.CustomMethod(userInput, chat);
+                        chat.State.CurrentMessage.CustomMethod(userInput);
                     }
                     else if(chat.State.CurrentMessage.PropertySetter != null)
                     {
-                        LibActions.SetDataContextStringProperty(userInput, chat, chat.State.CurrentMessage.PropertySetter);
+                        LibActions.SetDataContextStringProperty(userInput, chat.State.CurrentMessage.PropertySetter);
                     }
 
                     //TelegramActions.sendMessage(chat.chatId, "Допустим, что сохранили:" + userInput, customKeyboard, config.BotClient);
                     chat.State.ProcessedUserInput = true;
                     return true;
                 case MessageType.pause:
-                    TelegramActions.sendMessage(chat.chatId, "Допустим, что тут будет пауза.", customKeyboard, config.BotClient);
+                    TelegramActions.sendMessage(chat.СhatId, "Допустим, что тут будет пауза.", customKeyboard, config.BotClient);
                     return true;
                 case MessageType.Custom:
                     if(chat.State.CurrentMessage.CustomMethod != null)
                     {
-                        chat.State.CurrentMessage.CustomMethod(userInput, chat);
+                        chat.State.CurrentMessage.CustomMethod(userInput);
                         return true;
                     }
                     else
                     {
-                        TelegramActions.sendMessage(chat.chatId, "Выполнилась кастомная хрень.", customKeyboard, config.BotClient);
+                        TelegramActions.sendMessage(chat.СhatId, "Выполнилась кастомная хрень.", customKeyboard, config.BotClient);
                         return true;
                     }
                 default:
@@ -127,7 +130,7 @@ namespace BotDesignerLib
             if (chat.State.CurrentMessage == chat.State.CurrentMessageBlock.Messages.Last())
             {
                 chat.State.HasBeenAtLastMessage = true;
-                var allPossibleTransitions = config.Schema.Steps.Where(x => x.FromBlock == currentMessageBlock).Select(x => x.ToBlock).ToList();
+                var allPossibleTransitions = chat.Schema.Steps.Where(x => x.FromBlock == currentMessageBlock).Select(x => x.ToBlock).ToList();
 
                 if (allPossibleTransitions != null && allPossibleTransitions.Count == 1)
                 {
@@ -137,7 +140,7 @@ namespace BotDesignerLib
                     return true;
                 }
                 
-                var userDefinedSteps = config.Schema.Steps
+                var userDefinedSteps = chat.Schema.Steps
                     .Where(x => x.FromBlock == currentMessageBlock && x.Transition.DisplayName == transitionInput)
                     .Select(x => x.ToBlock).ToList();
 
