@@ -48,7 +48,7 @@ namespace BotDesignerLib
         public string Content { get; set; }
         public Func<string, string> TextWithProperties { get; set; }
         public Action<string> PropertySetter { get; set; }
-        public Func<string, LibActionResult> CustomMethod {get;set; }
+        public Func<string, Chat, LibActionResult> CustomMethod {get;set; }
         public MessageType Type { get; set; }
 
         public SchemaAction()

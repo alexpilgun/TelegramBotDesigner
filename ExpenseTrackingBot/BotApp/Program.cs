@@ -8,6 +8,7 @@ using MihaZupan;
 using System.Linq;
 using System.Collections.Generic;
 using BotDesignerLib;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace ExpenseTrackingBot
 {
@@ -28,6 +29,8 @@ namespace ExpenseTrackingBot
             var initializationStatus = config.BotClient.TestApiAsync().Result;
 
             config.BotClient.OnMessage += Bot_OnMessage;
+            config.BotClient.OnCallbackQuery += Bot_OnCallbackQuery;
+
             config.BotClient.StartReceiving();
 
             while (true)
@@ -39,7 +42,14 @@ namespace ExpenseTrackingBot
 
         static async void Bot_OnMessage(object sender, MessageEventArgs e)
         {
-            SchemaWalker.WalkThroughSchema(e.Message.Chat.Id, e.Message.Text, config);
+            //ToDo: add await
+            SchemaWalker.WalkThroughSchema(e.Message.Chat.Id, e.Message.Text, config, null);
+        }
+
+        static async void Bot_OnCallbackQuery(object sender, CallbackQueryEventArgs e)
+        {
+            //SchemaWalker.WalkThroughSchema(e.Message.Chat.Id, e.Message.Text, config);
+            SchemaWalker.WalkThroughSchema(e.CallbackQuery.Message.Chat.Id, e.CallbackQuery.Data, config, e.CallbackQuery);
         }
     }
 }

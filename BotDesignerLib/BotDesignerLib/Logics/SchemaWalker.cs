@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace BotDesignerLib
 {
     public static class SchemaWalker
     {
-        public static void WalkThroughSchema(long currentChatId, string userInput, LibConfigurationModule config)
+        public static void WalkThroughSchema(long currentChatId, string userInput, LibConfigurationModule config, CallbackQuery callbackQuery)
         {
             Chat chat = config.DbConnector.chats.Where(x => x.СhatId == currentChatId).FirstOrDefault();
-            var v = 5;
+
             if (chat == null)
             {
                 chat = new Chat(currentChatId, config);
@@ -22,7 +23,13 @@ namespace BotDesignerLib
 
             do
             {
-                if(chat.State.ProcessedUserInput)
+                if(callbackQuery != null)
+                {
+                    TelegramActions.removeInlineKeyboard(currentChatId, callbackQuery, config.BotClient);
+                    callbackQuery = null;
+                }
+
+                if (chat.State.ProcessedUserInput)
                 {
                     userInput = null;
                 }
@@ -61,7 +68,7 @@ namespace BotDesignerLib
                     chat.State.WaitForUserTransition = true;
                     if(chat.State.CurrentMessage.Type != MessageType.saveUserInput || chat.State.HasBeenAtLastMessage)
                     {
-                        customKeyboard = createCustomKeyboard(possibleSteps);
+                        customKeyboard = KeyboardManagement.createReplyKeyboard(possibleSteps);
                     }
                 }
             }
@@ -84,11 +91,11 @@ namespace BotDesignerLib
                 case MessageType.saveUserInput:
                     if (chat.State.CurrentMessage.CustomMethod != null)
                     {
-                        chat.State.CurrentMessage.CustomMethod(userInput);
+                        chat.State.CurrentMessage.CustomMethod(userInput, chat);
                     }
                     else if(chat.State.CurrentMessage.PropertySetter != null)
                     {
-                        LibActions.SetDataContextStringProperty(userInput, chat.State.CurrentMessage.PropertySetter);
+                        LibActions.SetDataContextProperty(userInput, chat.State.CurrentMessage.PropertySetter);
                     }
 
                     //TelegramActions.sendMessage(chat.chatId, "Допустим, что сохранили:" + userInput, customKeyboard, config.BotClient);
@@ -100,7 +107,12 @@ namespace BotDesignerLib
                 case MessageType.Custom:
                     if(chat.State.CurrentMessage.CustomMethod != null)
                     {
-                        chat.State.CurrentMessage.CustomMethod(userInput);
+                        chat.State.CurrentMessage.CustomMethod(userInput, chat);
+                        return true;
+                    }
+                    else if (chat.State.CurrentMessage.PropertySetter != null)
+                    {
+                        LibActions.SetDataContextProperty(userInput, chat.State.CurrentMessage.PropertySetter);
                         return true;
                     }
                     else
@@ -167,28 +179,6 @@ namespace BotDesignerLib
             }
 
             return false;
-        }
-
-        public static Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup createCustomKeyboard(List<SchemaStep> possibleSteps)
-        {
-            var buttonsRow = new List<Telegram.Bot.Types.ReplyMarkups.KeyboardButton>();
-
-            foreach (var t in possibleSteps)
-            {
-                buttonsRow.Add(new Telegram.Bot.Types.ReplyMarkups.KeyboardButton(t.Transition.DisplayName));
-            }
-
-            var replyKeyboard = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup()
-            {
-                OneTimeKeyboard = true,
-                ResizeKeyboard = true
-            };
-
-            replyKeyboard.Keyboard = new List<List<Telegram.Bot.Types.ReplyMarkups.KeyboardButton>>()
-            {
-                buttonsRow
-            };
-            return replyKeyboard;
         }
     }
 }

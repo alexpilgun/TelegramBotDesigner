@@ -37,9 +37,4 @@ namespace BotDesignerLib
             WaitForUserTransition = false;
         }
     }
-
-    public interface IDataContext
-    {
-
-    }
 }

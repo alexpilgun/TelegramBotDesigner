@@ -24,4 +24,28 @@ namespace ExpenseTrackingBot
             return new LibActionResult() { Status = true };
         }
     }
+    public static class ExpenseActions
+    {
+        public static LibActionResult ProcessExpenseValue(string userInput, Chat chat)
+        {
+            bool status = false;
+            if (Decimal.TryParse(userInput, out decimal val))
+            {
+                ((DomainDataContext)chat.DataContext).Expenses.CurrentObject.ExpenseValue = val;
+                status = true;
+            }
+            
+            return new LibActionResult() { Status = status };
+        }
+
+        public static LibActionResult SendExpenseCategoriesList(Chat chat)
+        {
+            var status = false;
+            var messageText = "Выбери категорию расхода:";
+            
+            //bool status = TelegramActions.sendMessage(chat.СhatId, messageText, null, botClient);
+
+            return new LibActionResult() { Status = status };
+        }
+    }
 }

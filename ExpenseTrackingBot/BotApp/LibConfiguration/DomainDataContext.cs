@@ -10,16 +10,16 @@ namespace ExpenseTrackingBot
         public Guid Id { get; }
         public string UserId { get; set; }
         public string UserName { get; set; }
-        public List<Expense> Expenses { get; set; }
-        public List<ExpenseCategory> Categories { get; set; }
+        public CollectionObject<Expense> Expenses { get; set; }
+        public CollectionObject<ExpenseCategory> Categories { get; set; }
         public GoogleSheetsConnector GSheetsConnector { get; set; }
 
         public DomainDataContext (string userId)
         {
             Id = new Guid();
             UserId = userId;
-            Expenses = new List<Expense>();
-            Categories = new List<ExpenseCategory>();
+            Expenses = new CollectionObject<Expense>();
+            Categories = new CollectionObject<ExpenseCategory>();
             GSheetsConnector = new GoogleSheetsConnector();
         }
 
@@ -27,27 +27,25 @@ namespace ExpenseTrackingBot
 
 }
 
-    public class Expense
+    public class Expense: GuidEntity
     {
-        public Guid Id { get; }
         public decimal ExpenseValue { get; set; }
         public ExpenseCategory Category { get; set; }
         public DateTime ExpenseDate { get; set; }
 
         public Expense()
         {
-            Id = new Guid();
+
         }
     }
 
-    public class ExpenseCategory
+    public class ExpenseCategory : GuidEntity
     {
-        public Guid Id { get; }
         public string Name { get;set;}
 
         public ExpenseCategory()
         {
-            Id = new Guid();
+            
         }
     }
 

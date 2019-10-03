@@ -83,12 +83,17 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                PropertySetter = i => ((DomainDataContext)Chat.DataContext).Expenses.AddOrEdit(new Expense()),
+                                Type = MessageType.Custom
+                            },
+                            new SchemaAction()
+                            {
                                 Content = "Внеси сумму расхода:",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
-                                Content = "",
+                                CustomMethod = ExpenseActions.ProcessExpenseValue,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()

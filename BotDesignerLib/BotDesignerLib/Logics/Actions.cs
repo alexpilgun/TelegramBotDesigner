@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace BotDesignerLib
 {
     public static class TelegramActions
     {
-        //Todo: add exception handling
-        public static bool sendMessage(long chatId, string textToSend, Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup keyboard, TelegramBotClient botClient)
+        //ToDo: add exception handling
+        public static bool sendMessage(long chatId, string textToSend, ReplyKeyboardMarkup keyboard, TelegramBotClient botClient)
         {
 
             try
@@ -25,6 +27,34 @@ namespace BotDesignerLib
             {
                 return false;
             }
+        }
+
+        public static bool editMessage(long chatId, int messageId, string textToEdit, InlineKeyboardMarkup keyboard, TelegramBotClient botClient)
+        {
+            try
+            {
+                //var editMessage = botClient.EditMessageTextAsync(ChatId chat, );
+                //(ChatId chatId, int messageId, string textToEdit);
+                botClient.EditMessageTextAsync(
+                            chatId,
+                            messageId,
+                            textToEdit,
+                            replyMarkup: keyboard
+                        );
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool removeInlineKeyboard(long chatId, CallbackQuery callbackQuery, TelegramBotClient botClient)
+        {
+            var result = editMessage(chatId, callbackQuery.Message.MessageId, callbackQuery.Message.Text, null, botClient);
+
+            return true;
         }
 
         public static bool sendImage(long chatId, string imageUrl, Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup keyboard, TelegramBotClient botClient)
@@ -47,7 +77,7 @@ namespace BotDesignerLib
 
     public static class LibActions
     {
-        public static bool SetDataContextStringProperty(string UserInput, Action<string> propertySetter)
+        public static bool SetDataContextProperty(string UserInput, Action<string> propertySetter)
         {
             if(!String.IsNullOrEmpty(UserInput))
             {
