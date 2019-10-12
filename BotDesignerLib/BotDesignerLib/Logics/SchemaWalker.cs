@@ -37,6 +37,7 @@ namespace BotDesignerLib
                 wasProcessed = ProcessChatState(chat, userInput, config);
                 if(!wasProcessed)
                 {
+                    TelegramActions.sendMessage(chat.СhatId, chat.State.CurrentMessage.ErrorHandlingMessage, null, config.BotClient);
                     break;
                 }
                 StepForward(chat, userInput, config);
@@ -72,7 +73,9 @@ namespace BotDesignerLib
                     }
                 }
             }
-            
+
+            bool executionResult = false;
+
             switch(chat.State.CurrentMessage.Type)
             {
                 case MessageType.sendMessage:
@@ -91,24 +94,24 @@ namespace BotDesignerLib
                 case MessageType.saveUserInput:
                     if (chat.State.CurrentMessage.CustomMethod != null)
                     {
-                        chat.State.CurrentMessage.CustomMethod(userInput, chat);
+                        var result = chat.State.CurrentMessage.CustomMethod(userInput, chat, config.BotClient);
+                        executionResult = result.Status;
                     }
                     else if(chat.State.CurrentMessage.PropertySetter != null)
                     {
                         LibActions.SetDataContextProperty(userInput, chat.State.CurrentMessage.PropertySetter);
+                        executionResult = true;
                     }
-
-                    //TelegramActions.sendMessage(chat.chatId, "Допустим, что сохранили:" + userInput, customKeyboard, config.BotClient);
-                    chat.State.ProcessedUserInput = true;
-                    return true;
+                    chat.State.ProcessedUserInput = executionResult;
+                    return executionResult;
                 case MessageType.pause:
                     TelegramActions.sendMessage(chat.СhatId, "Допустим, что тут будет пауза.", customKeyboard, config.BotClient);
                     return true;
                 case MessageType.Custom:
                     if(chat.State.CurrentMessage.CustomMethod != null)
                     {
-                        chat.State.CurrentMessage.CustomMethod(userInput, chat);
-                        return true;
+                        var result = chat.State.CurrentMessage.CustomMethod(userInput, chat, config.BotClient);
+                        return result.Status;
                     }
                     else if (chat.State.CurrentMessage.PropertySetter != null)
                     {

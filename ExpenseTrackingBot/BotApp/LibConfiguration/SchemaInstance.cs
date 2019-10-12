@@ -54,8 +54,23 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
-                                Content = "Заноси свои расходы, получай агрегированные отчеты и понимай, на что именно ты тратишь деньги!",
+                                Content = "Давай авторизуемся у Google!",
                                 Type = MessageType.sendMessage
+                            },
+                            new SchemaAction()
+                            {
+                                CustomMethod=GoogleSheetsAuthActions.AuthorizeAndGetSheetsService,
+                                Type = MessageType.Custom
+                            },
+                            new SchemaAction()
+                            {
+                                Content = "Скопируй ссылку на файл в GoogleSheets, где ты будешь хранить расходы.",
+                                Type = MessageType.sendMessage
+                            },
+                            new SchemaAction()
+                            {
+                                CustomMethod = GoogleSheetsAuthActions.SetSpreadsheetId,
+                                Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
@@ -83,8 +98,11 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                PropertySetter = i => ((DomainDataContext)Chat.DataContext).Expenses.AddOrEdit(new Expense()),
+                                //PropertySetter = i => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = new Expense(),
+                                PropertySetter = i => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = new Expense(),
                                 Type = MessageType.Custom
+                                //CustomMethod = ExpenseActions.SetNewCurrentExpense,
+                                //Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
@@ -94,16 +112,19 @@ namespace ExpenseTrackingBot
                             new SchemaAction()
                             {
                                 CustomMethod = ExpenseActions.ProcessExpenseValue,
+                                ErrorHandlingMessage = "Некорректная цифра, попробуйте еще раз",
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
-                                Content = "Выбери категорию расхода:",
-                                Type = MessageType.sendMessage
+                                CustomMethod = ExpenseActions.SendExpenseCategoriesList,
+                                //Content = "Выбери категорию расхода:",
+                                Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
-                                Content = "",
+                                //PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.Category = v,
+                                CustomMethod = ExpenseActions.SetExpenseCategory,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
@@ -120,9 +141,19 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                Content = "",
-                                Type = MessageType.Custom
+                                TextWithProperties = v => String.Format("{0} - {1}",
+            ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.Category.Name,
+            ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.ExpenseValue
+            ),
+                                Type = MessageType.sendMessage
+                                //CustomMethod=ExpenseActions.PrintExpense,
+                                //Type = MessageType.Custom
                             },
+                            new SchemaAction()
+                            {
+                                PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = null,
+                                Type = MessageType.Custom
+                            }
                         }
                     },
                     new SchemaActionBlock()

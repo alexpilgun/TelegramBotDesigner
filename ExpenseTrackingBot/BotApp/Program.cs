@@ -18,10 +18,12 @@ namespace ExpenseTrackingBot
 
         static void Main(string[] args)
         {
+            string telegramBotAccessToken = System.IO.File.ReadAllText("C:\\Users\\sleep\\Documents\\TelegramBotDesignerRepos\\ExpenseTrackingBotCreds\\TelegramBotAccessToken.txt");
+
             config = new LibConfigurationModule()
             {
                 DbConnector = new DbConnector(),
-                BotClient = new TelegramBotClient("713947361:AAF9PylFSAAd3Bi1xKseyEaoPukwIw1FJwk", new HttpToSocks5Proxy("127.0.0.1", 9054)),
+                BotClient = new TelegramBotClient(telegramBotAccessToken, new HttpToSocks5Proxy("127.0.0.1", 9054)),
                 DomainSchemaType = typeof(SchemaInstance),
                 DomainDataContextType = typeof(DomainDataContext)
             };

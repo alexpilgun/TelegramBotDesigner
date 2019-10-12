@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Telegram.Bot;
 
 namespace BotDesignerLib
 {
@@ -48,8 +49,9 @@ namespace BotDesignerLib
         public string Content { get; set; }
         public Func<string, string> TextWithProperties { get; set; }
         public Action<string> PropertySetter { get; set; }
-        public Func<string, Chat, LibActionResult> CustomMethod {get;set; }
+        public Func<string, Chat, TelegramBotClient, LibActionResult> CustomMethod {get;set; }
         public MessageType Type { get; set; }
+        public string ErrorHandlingMessage { get; set; }
 
         public SchemaAction()
         {

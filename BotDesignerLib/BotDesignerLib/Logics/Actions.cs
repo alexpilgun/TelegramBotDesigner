@@ -10,7 +10,7 @@ namespace BotDesignerLib
     public static class TelegramActions
     {
         //ToDo: add exception handling
-        public static bool sendMessage(long chatId, string textToSend, ReplyKeyboardMarkup keyboard, TelegramBotClient botClient)
+        public static bool sendMessage(long chatId, string textToSend, IReplyMarkup keyboard, TelegramBotClient botClient)
         {
 
             try
@@ -81,9 +81,9 @@ namespace BotDesignerLib
         {
             if(!String.IsNullOrEmpty(UserInput))
             {
-                propertySetter(UserInput);
+                
             }
-
+            propertySetter(UserInput);
             return true;
         }
 

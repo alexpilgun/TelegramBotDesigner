@@ -13,7 +13,7 @@ namespace BotDesignerLib
         public Chat(long chatIdInput, LibConfigurationModule config)
         {
             СhatId = chatIdInput;
-            DataContext = (IDataContext)Activator.CreateInstance(config.DomainDataContextType);
+            DataContext = (IDataContext)Activator.CreateInstance(config.DomainDataContextType, chatIdInput);
             Schema = (Schema)Activator.CreateInstance(config.DomainSchemaType);
             Schema.Chat = this;
             State = new State(this);

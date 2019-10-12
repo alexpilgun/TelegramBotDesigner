@@ -40,5 +40,11 @@ namespace BotDesignerLib
                 existingObject = obj;
             }
         }
+
+        public void ClearCurrentObject()
+        {
+            this.CurrentObject = null;
+            return;
+        }
     }
 }
