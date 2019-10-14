@@ -140,7 +140,7 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
-                                Content = "Ура, расход учтен!",
+                                Content = "Расход создан. Отправляем в Google Sheets?",
                                 Type = MessageType.sendMessage
                             },
                         }
@@ -162,6 +162,17 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
+                                CustomMethod = GoogleSheetsActions.InsertExpenseToGoogleSheet,
+                                Type = MessageType.Custom
+                            },
+                            new SchemaAction()
+                            {
+                                PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.Objects.Add(
+                                    ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject),
+                                Type = MessageType.Custom
+                            },
+                            new SchemaAction()
+                            {
                                 PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = null,
                                 Type = MessageType.Custom
                             }
@@ -174,9 +185,14 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                Content = "",
+                                PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = null,
                                 Type = MessageType.Custom
                             },
+                            new SchemaAction()
+                            {
+                                Content = "Расход отменен",
+                                Type = MessageType.sendMessage
+                            }
                         }
                     },
                     new SchemaActionBlock()
@@ -293,19 +309,25 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                Content = "Пришли ID Google Sheets, где будут хранится твои расходы.",
+                                Content = "Скопируй ссылку на файл в GoogleSheets, где ты будешь хранить расходы.",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
-                                Content = "",
+                                CustomMethod = GoogleAuthActions.SetSpreadsheet,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
-                                Content = "Записано!",
-                                Type = MessageType.sendMessage
+                                CustomMethod = GoogleAuthActions.SendSheetsListForSelect,
+                                Type = MessageType.Custom
                             },
+                            new SchemaAction()
+                            {
+                                //PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.Category = v,
+                                CustomMethod = GoogleAuthActions.SetSheet,
+                                Type = MessageType.saveUserInput
+                            }
                         }
                     },
                     new SchemaActionBlock()
@@ -315,12 +337,17 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                Content = "",
+                                CustomMethod = GoogleAuthActions.RemoveGoogleAuthorization,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
-                                Content = "Соединение установлено!",
+                                CustomMethod=GoogleAuthActions.AuthorizeAndGetSheetsService,
+                                Type = MessageType.Custom
+                            },
+                            new SchemaAction()
+                            {
+                                Content = "Авторизация прошла успешно!",
                                 Type = MessageType.sendMessage
                             },
                         }

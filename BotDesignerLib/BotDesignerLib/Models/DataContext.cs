@@ -27,6 +27,13 @@ namespace BotDesignerLib
         public T CurrentObject { get; set; }
         public List<T> Objects { get; }
 
+        
+        public CollectionObject ()
+        {
+            Objects = new List<T>();
+        }
+
+
         public void AddOrEdit(T obj)
         {
             var existingObject = Objects.Where(o => o.Id == obj.Id).FirstOrDefault();

@@ -43,6 +43,23 @@ namespace ExpenseTrackingBot
             return new LibActionResult() { Status = true };
         }
 
+        public static LibActionResult RemoveGoogleAuthorization(string userInput, Chat chat, TelegramBotClient botClient)
+        {
+            var connector = ((DomainDataContext)chat.DataContext).GoogleSheetsConnector;
+
+            connector.UserCredential = null;
+            connector.SheetsService = null;
+            var userCredPath = new StringBuilder();
+            userCredPath.Append(GoogleSheetsConnectorConfig.DataStore.FolderPath);
+            userCredPath.Append("\\");
+            userCredPath.Append("Google.Apis.Auth.OAuth2.Responses.TokenResponse-");
+            userCredPath.Append(chat.СhatId.ToString());
+
+            File.Delete(userCredPath.ToString());
+
+            return new LibActionResult { Status = true };
+        }
+
         public static LibActionResult SetSpreadsheet(string userInput, Chat chat, TelegramBotClient botClient)
         {
             var connector = ((DomainDataContext)chat.DataContext).GoogleSheetsConnector;
