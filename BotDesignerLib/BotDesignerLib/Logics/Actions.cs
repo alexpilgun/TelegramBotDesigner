@@ -106,6 +106,7 @@ namespace BotDesignerLib
     public class LibActionResult
     {
         public bool Status { get; set; }
+        public string ErrorMessage { get; set; }
         public LibActionResult() { }
     }
 }

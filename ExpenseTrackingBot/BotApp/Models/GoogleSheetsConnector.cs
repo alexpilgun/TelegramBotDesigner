@@ -23,6 +23,8 @@ namespace ExpenseTrackingBot
     {
         public string ChatId { get; }
         public string SpreadsheetId { get; set; }
+        public string Sheetname { get; set; }
+        public int? SheetId { get; set; }
         public UserCredential UserCredential { get; set; }
         public SheetsService SheetsService { get; set; }
 

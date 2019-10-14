@@ -59,7 +59,7 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
-                                CustomMethod=GoogleSheetsAuthActions.AuthorizeAndGetSheetsService,
+                                CustomMethod=GoogleAuthActions.AuthorizeAndGetSheetsService,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
@@ -69,7 +69,18 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
-                                CustomMethod = GoogleSheetsAuthActions.SetSpreadsheetId,
+                                CustomMethod = GoogleAuthActions.SetSpreadsheet,
+                                Type = MessageType.saveUserInput
+                            },
+                            new SchemaAction()
+                            {
+                                CustomMethod = GoogleAuthActions.SendSheetsListForSelect,
+                                Type = MessageType.Custom
+                            },
+                            new SchemaAction()
+                            {
+                                //PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.Category = v,
+                                CustomMethod = GoogleAuthActions.SetSheet,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
