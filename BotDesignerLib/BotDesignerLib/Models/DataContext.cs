@@ -16,7 +16,7 @@ namespace BotDesignerLib
 
         public GuidEntity()
         {
-            Id = new Guid();
+            Id = Guid.NewGuid();
         }
 
         //public abstract void AddOrEdit(GuidEntity e);
@@ -44,7 +44,8 @@ namespace BotDesignerLib
             }
             else
             {
-                existingObject = obj;
+                var index = Objects.IndexOf(existingObject);
+                Objects[index] = obj;
             }
         }
 
@@ -52,6 +53,14 @@ namespace BotDesignerLib
         {
             this.CurrentObject = null;
             return;
+        }
+
+        public void Delete(T obj)
+        {
+            if (obj != default(T))
+            {
+                Objects.Remove(obj);
+            }
         }
     }
 }

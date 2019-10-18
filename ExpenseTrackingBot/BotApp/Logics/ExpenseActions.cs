@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using BotDesignerLib;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -21,33 +22,17 @@ namespace ExpenseTrackingBot
             return new LibActionResult() { Status = status };
         }
 
-        public static LibActionResult SendExpenseCategoriesList(string userInput, Chat chat, TelegramBotClient botClient)
-        {
-            var status = false;
-            var messageText = "Выбери категорию расхода:";
-            var inlineKeyboard = new InlineKeyboardMarkup(new List<InlineKeyboardButton> ()
-            { 
-                InlineKeyboardButton.WithCallbackData(
-                    "Категория 1",
-                    "Category_1"
-                    ),
-                InlineKeyboardButton.WithCallbackData(
-                    "Категория 2",
-                    "Category_2"
-                    )
-                }
-                );
-
-            status = TelegramActions.sendMessage(chat.СhatId, messageText, inlineKeyboard, botClient);
-
-            return new LibActionResult() { Status = status };
-        }
-
         public static LibActionResult SetExpenseCategory(string userInput, Chat chat, TelegramBotClient botClient)
         {
-            var expenseCategory = new ExpenseCategory();
-            expenseCategory.Name = userInput;
-            ((DomainDataContext)chat.DataContext).Expenses.CurrentObject.Category = expenseCategory;
+            var expenseCategories = ((DomainDataContext)chat.DataContext).ExpenseCategories.Objects;
+            var selectedCategory = expenseCategories.Where(x => x.Name == userInput).FirstOrDefault();
+            
+            if(selectedCategory == null)
+            {
+                return new LibActionResult { Status = false, ErrorMessage = "Категория не найдена" };
+            }
+
+            ((DomainDataContext)chat.DataContext).Expenses.CurrentObject.Category = selectedCategory;
 
             return new LibActionResult() { Status = true };
         }

@@ -85,6 +85,16 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
+                                Content = "Напиши через точку с запятой категории расходов, которые будешь использовать",
+                                Type = MessageType.sendMessage
+                            },
+                            new SchemaAction()
+                            {
+                                CustomMethod = ExpenseCategoryActions.BulkCreateCategories,
+                                Type = MessageType.saveUserInput
+                            },
+                            new SchemaAction()
+                            {
                                 Content = "https://st.kp.yandex.net/images/film_iphone/iphone360_19373.jpg",
                                 Type = MessageType.sendImage
                             }
@@ -128,8 +138,7 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
-                                CustomMethod = ExpenseActions.SendExpenseCategoriesList,
-                                //Content = "Выбери категорию расхода:",
+                                CustomMethod = ExpenseCategoryActions.SendExpenseCategoriesList,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
@@ -231,17 +240,14 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
-                                Content = "",
-                                Type = MessageType.saveUserInput
+                                CustomMethod = ExpenseCategoryActions.CreateExpenseCategory,
+                                Type = MessageType.saveUserInput,
+                                ErrorHandlingMessage = "Такая категория уже существует"
+
                             },
                             new SchemaAction()
                             {
-                                Content = "",
-                                Type = MessageType.Custom
-                            },
-                            new SchemaAction()
-                            {
-                                Content = "Ура, категория создана!",
+                                Content = "Категория создана!",
                                 Type = MessageType.sendMessage
                             },
                         }
@@ -253,19 +259,29 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                Content = "Какую категорию изменим?",
-                                Type = MessageType.sendMessage
+                                CustomMethod = ExpenseCategoryActions.SendExpenseCategoriesList,
+                                Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
-                                Content = "",
+                                CustomMethod = ExpenseCategoryActions.SelectCategory,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
-                                Content = "",
-                                Type = MessageType.Custom
+                                Content = "Введите новое название категории",
+                                Type = MessageType.sendMessage
                             },
+                            new SchemaAction()
+                            {
+                                CustomMethod = ExpenseCategoryActions.EditExpenseCategory,
+                                Type = MessageType.saveUserInput
+                            },
+                            new SchemaAction()
+                            {
+                                Content = "Категория изменена",
+                                Type = MessageType.sendMessage
+                            }
                         }
                     },
                     new SchemaActionBlock()
@@ -275,19 +291,24 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                Content = "Какую категорию удалим?",
-                                Type = MessageType.sendMessage
+                                CustomMethod = ExpenseCategoryActions.SendExpenseCategoriesList,
+                                Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
-                                Content = "",
+                                CustomMethod = ExpenseCategoryActions.SelectCategory,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
-                                Content = "Какую категорию удалим?",
+                                CustomMethod = ExpenseCategoryActions.DeleteExpenseCategory,
                                 Type = MessageType.Custom
                             },
+                            new SchemaAction()
+                            {
+                                Content = "Категория удалена",
+                                Type = MessageType.sendMessage
+                            }
                         }
                     },
                     new SchemaActionBlock()

@@ -12,14 +12,14 @@ namespace ExpenseTrackingBot
         public string UserName { get; set; }
         public GoogleSheetsConnector GoogleSheetsConnector { get; set; }
         public CollectionObject<Expense> Expenses { get; set; }
-        public CollectionObject<ExpenseCategory> Categories { get; set; }
+        public CollectionObject<ExpenseCategory> ExpenseCategories { get; set; }
 
         public DomainDataContext (long userId)
         {
             Id = new Guid();
             UserId = userId;
             Expenses = new CollectionObject<Expense>();
-            Categories = new CollectionObject<ExpenseCategory>();
+            ExpenseCategories = new CollectionObject<ExpenseCategory>();
             GoogleSheetsConnector = new GoogleSheetsConnector(userId);
         }
 }
@@ -30,7 +30,7 @@ namespace ExpenseTrackingBot
         public ExpenseCategory Category { get; set; }
         public DateTime ExpenseDate { get; set; }
 
-        public Expense()
+        public Expense() : base()
         {
             ExpenseValue = 0M;
             ExpenseDate = DateTime.Now;
@@ -41,9 +41,9 @@ namespace ExpenseTrackingBot
     {
         public string Name { get;set;}
 
-        public ExpenseCategory()
+        public ExpenseCategory(string name) : base()
         {
-            
+            Name = name;
         }
     }
 }
