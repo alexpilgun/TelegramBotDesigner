@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using BotDesignerLib;
+using LiteDB;
 
 namespace ExpenseTrackingBot
 {
+    [Serializable]
     public class DomainDataContext: IDataContext
     {
         public Guid Id { get; }
@@ -22,8 +24,9 @@ namespace ExpenseTrackingBot
             ExpenseCategories = new CollectionObject<ExpenseCategory>();
             GoogleSheetsConnector = new GoogleSheetsConnector(userId);
         }
-}
+    }
 
+    [Serializable]
     public class Expense: GuidEntity
     {
         public decimal ExpenseValue { get; set; }
@@ -36,7 +39,7 @@ namespace ExpenseTrackingBot
             ExpenseDate = DateTime.Now;
         }
     }
-
+    [Serializable]
     public class ExpenseCategory : GuidEntity
     {
         public string Name { get;set;}
@@ -47,3 +50,4 @@ namespace ExpenseTrackingBot
         }
     }
 }
+

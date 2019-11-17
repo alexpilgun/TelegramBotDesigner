@@ -22,7 +22,7 @@ namespace ExpenseTrackingBot
 
             config = new LibConfigurationModule()
             {
-                DbConnector = new DbConnector(),
+                DbConnector = new DBConnector(@"LiteDBFile.db"),
                 BotClient = new TelegramBotClient(telegramBotAccessToken, new HttpToSocks5Proxy("127.0.0.1", 9054)),
                 DomainSchemaType = typeof(SchemaInstance),
                 DomainDataContextType = typeof(DomainDataContext)

@@ -10,7 +10,7 @@ namespace BotDesignerLib
     public class LibConfigurationModule
     {
         public TelegramBotClient BotClient { get; set; }
-        public DbConnector DbConnector {get;set; }
+        public IDbConnector DbConnector {get;set; }
         public Type DomainSchemaType {get;set; }
         public Type DomainDataContextType { get; set; }
 

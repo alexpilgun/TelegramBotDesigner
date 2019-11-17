@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace BotDesignerLib
 {
+    [Serializable]
     public class Chat
     {
         public readonly long СhatId;
@@ -19,10 +20,10 @@ namespace BotDesignerLib
             State = new State(this);
         }
     }
-
+    [Serializable]
     public class State
     {
-        public Chat Chat { get; set; }
+        //public Chat Chat { get; set; }
         public SchemaActionBlock CurrentMessageBlock { get; set; }
         public SchemaAction CurrentMessage { get; set; }
         public bool WaitForUserTransition { get; set; }
@@ -31,7 +32,7 @@ namespace BotDesignerLib
 
         public State(Chat chat)
         {
-            Chat = chat;
+            //Chat = chat;
             CurrentMessageBlock = chat.Schema.Steps.First().FromBlock;
             CurrentMessage = this.CurrentMessageBlock.Messages.First();
             WaitForUserTransition = false;

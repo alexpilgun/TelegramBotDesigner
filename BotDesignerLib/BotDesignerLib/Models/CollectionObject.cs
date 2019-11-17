@@ -5,11 +5,7 @@ using System.Linq;
 
 namespace BotDesignerLib
 {
-    public interface IDataContext
-    {
-
-    }
-
+    [Serializable]
     public abstract class GuidEntity
     {
         public Guid Id { get; }
@@ -22,13 +18,14 @@ namespace BotDesignerLib
         //public abstract void AddOrEdit(GuidEntity e);
     }
 
-    public class CollectionObject<T> where T: GuidEntity
+    [Serializable]
+    public class CollectionObject<T> where T : GuidEntity
     {
         public T CurrentObject { get; set; }
         public List<T> Objects { get; }
 
-        
-        public CollectionObject ()
+
+        public CollectionObject()
         {
             Objects = new List<T>();
         }
@@ -38,7 +35,7 @@ namespace BotDesignerLib
         {
             var existingObject = Objects.Where(o => o.Id == obj.Id).FirstOrDefault();
 
-            if (existingObject == default(T) )
+            if (existingObject == default(T))
             {
                 Objects.Add(obj);
             }

@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using Telegram.Bot;
+using LiteDB;
 
 namespace BotDesignerLib
 {
+    [Serializable]
     public class Schema
     {
         public string Id { get; }
+        [BsonIgnore]
         public Chat Chat;
         public List<SchemaStep> Steps {get;set;}
 
@@ -16,7 +19,7 @@ namespace BotDesignerLib
             Id = Guid.NewGuid().ToString("N");
         }
     }
-    
+    [Serializable]
     public class SchemaStep
     {
         // ToDo: merge SchemaStep and Transition
@@ -30,7 +33,7 @@ namespace BotDesignerLib
             Id = Guid.NewGuid().ToString("N");
         }
     }
-
+    [Serializable]
     public class SchemaActionBlock
     {
         public string Id { get; }
@@ -42,7 +45,7 @@ namespace BotDesignerLib
             Id = Guid.NewGuid().ToString("N");
         }
     }
-
+    [Serializable]
     public class SchemaAction
     {
         public string Id { get; }
@@ -59,6 +62,7 @@ namespace BotDesignerLib
         }
     }
 
+    [Serializable]
     public class Transition
     {
         public string Id { get; }
@@ -74,6 +78,7 @@ namespace BotDesignerLib
 
     }
 
+    [Serializable]
     public enum MessageType
     {
         sendMessage,

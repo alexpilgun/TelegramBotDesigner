@@ -11,12 +11,12 @@ namespace BotDesignerLib
     {
         public static void WalkThroughSchema(long currentChatId, string userInput, LibConfigurationModule config, CallbackQuery callbackQuery)
         {
-            Chat chat = config.DbConnector.chats.Where(x => x.СhatId == currentChatId).FirstOrDefault();
+            Chat chat = config.DbConnector.GetChatById(currentChatId);
 
             if (chat == null)
             {
                 chat = new Chat(currentChatId, config);
-                config.DbConnector.chats.Add(chat);
+                config.DbConnector.CreateChat(chat);
             }
 
             bool wasProcessed;
@@ -48,8 +48,9 @@ namespace BotDesignerLib
                     break;
                 }
             }
-            while (true) ;
+            while (true);
 
+            config.DbConnector.UpdateChat(chat);
             return;
         }
 
