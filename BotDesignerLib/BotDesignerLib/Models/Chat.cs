@@ -1,40 +1,60 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace BotDesignerLib
 {
-    [Serializable]
     public class Chat
     {
-        public readonly long СhatId;
-        public Schema Schema { get; set; }
-        public State State { get; set; }
-        public IDataContext DataContext { get; set; }
+        [Key]
+        public long СhatId { get; set; }
+        [Required]
+        public virtual State State { get; set; }
+        [Required]
+        public virtual DataContext DataContext { get; set; }
+        public Chat() { }
 
         public Chat(long chatIdInput, LibConfigurationModule config)
         {
             СhatId = chatIdInput;
-            DataContext = (IDataContext)Activator.CreateInstance(config.DomainDataContextType, chatIdInput);
-            Schema = (Schema)Activator.CreateInstance(config.DomainSchemaType);
-            Schema.Chat = this;
-            State = new State(this);
+            DataContext = (DataContext)Activator.CreateInstance(config.DomainDataContextType, chatIdInput);
+            State = new State(this, config);
         }
     }
-    [Serializable]
+
     public class State
     {
-        //public Chat Chat { get; set; }
+        [Key]
+        public long Id { get; set; }
+        [NotMapped]
+        public Schema Schema { get; set; }
+        [Required]
+        public string SchemaName { get; set; }
+        [NotMapped]
         public SchemaActionBlock CurrentMessageBlock { get; set; }
+        [Required]
+        public string CurrentMessageBlockName { get; set; }
+        [NotMapped]
         public SchemaAction CurrentMessage { get; set; }
+        [Required]
+        public string CurrentMessageId { get; set; }
         public bool WaitForUserTransition { get; set; }
         public bool HasBeenAtLastMessage { get; set; }
         public bool ProcessedUserInput { get; set; }
-
-        public State(Chat chat)
+        public State() { }
+        public State(Chat chat, LibConfigurationModule config)
         {
-            //Chat = chat;
-            CurrentMessageBlock = chat.Schema.Steps.First().FromBlock;
-            CurrentMessage = this.CurrentMessageBlock.Messages.First();
+            Id = chat.СhatId;
+            //todo: wrap into method with exception thrown similiar to BindChatToSchemaHelpers
+            Schema = config.SchemasRepository["default"];
+            SchemaName = "default";
+            CurrentMessageBlock = Schema.Steps.First().FromBlock;
+            CurrentMessageBlockName = CurrentMessageBlock.Name;
+            CurrentMessage = CurrentMessageBlock.Messages.First();
+            CurrentMessageId = CurrentMessage.Id;
             WaitForUserTransition = false;
         }
     }

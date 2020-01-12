@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace BotDesignerLib
 {
     public class ChatStats
     {
-        public static string getReportOnCurrentChats(IDbConnector dbConnector)
+        public static string getReportOnCurrentChats(LibConfigurationModule config)
         {
             var result = new StringBuilder();
+            result.Append($"{DateTime.Now.ToString()} {System.Environment.NewLine}");
 
-            var currentChats = dbConnector.GetAllChats();
-            foreach(var c in currentChats)
+            using (var ctx = (LibDbContext)Activator.CreateInstance(config.DbContextType))
             {
-                result.Append("ChatId " + c.СhatId + " has state " + c.State.CurrentMessageBlock.Name + " & " + c.State.CurrentMessage.Content);
+                var chats = ctx.Chats.ToList();
+                foreach (var c in chats)
+                {
+                    result.Append("ChatId " + c.СhatId.ToString() + " has state " + c.State.CurrentMessageBlockName);
+                }
             }
+            result.Append($"{System.Environment.NewLine}");
             return result.ToString();
         }
     }

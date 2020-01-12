@@ -6,14 +6,16 @@ using BotDesignerLib;
 
 namespace ExpenseTrackingBot
 {
-    public class SchemaInstance: Schema
+    public class DefaultSchemaInstance: Schema
     {
-        public SchemaInstance()
+        public DefaultSchemaInstance()
         {
+            Name = "default";
             var messageBlocks = createMessageBlocks();
             var transitions = createTransitions();
 
             Steps = createSchemaSteps(messageBlocks, transitions);
+            Blocks = messageBlocks;
         }
 
         private List<SchemaActionBlock> createMessageBlocks ()
@@ -30,71 +32,84 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 Content = "Привет! Этот бот поможет тебе записывать твои расходы и потом анализировать их",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 Content = "Кcтати, как тебя зовут?",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
-                                PropertySetter = i => ((DomainDataContext)Chat.DataContext).UserName = i,
+                                Id = "3",
+                                PropertySetter = (c,i) => ((DomainDataContext)c.DataContext).UserName = i,
                                 //CustomMethod = DomainActions.SaveUserName,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "4",
                                 //Content = "Your name is: ", //+ ((DomainDataContext)Chat.DataContext).UserName,
-                                TextWithProperties = v => "Your name is: " + ((DomainDataContext)Chat.DataContext).UserName,
+                                TextWithProperties = c => $"Your name is: {((DomainDataContext)c.DataContext).UserName}",
                                 Type = MessageType.sendMessage
                                 //CustomMethod = DomainActions.SendUserName,
                                 //Type= MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "5",
                                 Content = "Давай авторизуемся у Google!",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
+                                Id = "6",
                                 CustomMethod=GoogleAuthActions.AuthorizeAndGetSheetsService,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "7",
                                 Content = "Скопируй ссылку на файл в GoogleSheets, где ты будешь хранить расходы.",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
+                                Id = "8",
                                 CustomMethod = GoogleAuthActions.SetSpreadsheet,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "9",
                                 CustomMethod = GoogleAuthActions.SendSheetsListForSelect,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "10",
                                 //PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.Category = v,
                                 CustomMethod = GoogleAuthActions.SetSheet,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "11",
                                 Content = "Напиши через точку с запятой категории расходов, которые будешь использовать",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
+                                Id = "12",
                                 CustomMethod = ExpenseCategoryActions.BulkCreateCategories,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "13",
                                 Content = "https://st.kp.yandex.net/images/film_iphone/iphone360_19373.jpg",
                                 Type = MessageType.sendImage
                             }
@@ -107,6 +122,7 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 Content = "Ты находишься в главном меню. Что будешь делать?",
                                 Type = MessageType.sendMessage
                             },
@@ -119,36 +135,42 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 //PropertySetter = i => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = new Expense(),
-                                PropertySetter = i => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = new Expense(),
+                                PropertySetter = (c,i) => ((DomainDataContext)c.DataContext).CurrentExpense = new Expense(),
                                 Type = MessageType.Custom
                                 //CustomMethod = ExpenseActions.SetNewCurrentExpense,
                                 //Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 Content = "Внеси сумму расхода:",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
+                                Id = "3",
                                 CustomMethod = ExpenseActions.ProcessExpenseValue,
                                 ErrorHandlingMessage = "Некорректная цифра, попробуйте еще раз",
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "4",
                                 CustomMethod = ExpenseCategoryActions.SendExpenseCategoriesList,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "5",
                                 //PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.Category = v,
                                 CustomMethod = ExpenseActions.SetExpenseCategory,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "6",
                                 Content = "Расход создан. Отправляем в Google Sheets?",
                                 Type = MessageType.sendMessage
                             },
@@ -161,28 +183,30 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                TextWithProperties = v => String.Format("{0} - {1}",
-            ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.Category.Name,
-            ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.ExpenseValue
-            ),
+                                Id = "1",
+                                TextWithProperties = c => $"{((DomainDataContext)c.DataContext).CurrentExpense.Category.Name} " +
+                                $"- {((DomainDataContext)c.DataContext).CurrentExpense.ExpenseValue}",
                                 Type = MessageType.sendMessage
                                 //CustomMethod=ExpenseActions.PrintExpense,
                                 //Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 CustomMethod = GoogleSheetsActions.InsertExpenseToGoogleSheet,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
-                                PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.Objects.Add(
-                                    ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject),
+                                Id = "3",
+                                PropertySetter = (c,i) => ((DomainDataContext)c.DataContext).Expenses.Add(
+                                    ((DomainDataContext)c.DataContext).CurrentExpense),
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
-                                PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = null,
+                                Id = "4",
+                                PropertySetter = (c,i) => ((DomainDataContext)c.DataContext).CurrentExpense = null,
                                 Type = MessageType.Custom
                             }
                         }
@@ -194,11 +218,14 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
-                                PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject = null,
+                                Id = "1",
+                                CustomMethod = ExpenseActions.DeleteCurrentExpense,
+                                //PropertySetter = (c,i) => ((DomainDataContext)c.DataContext).CurrentExpense = null,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 Content = "Расход отменен",
                                 Type = MessageType.sendMessage
                             }
@@ -211,6 +238,7 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 Content = "Что хочешь изменить?",
                                 Type = MessageType.sendMessage
                             },
@@ -223,6 +251,7 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 Content = "Что именно будем менять в категориях?",
                                 Type = MessageType.sendMessage
                             },
@@ -235,11 +264,13 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 Content = "Введи название новой категории:",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 CustomMethod = ExpenseCategoryActions.CreateExpenseCategory,
                                 Type = MessageType.saveUserInput,
                                 ErrorHandlingMessage = "Такая категория уже существует"
@@ -247,6 +278,7 @@ namespace ExpenseTrackingBot
                             },
                             new SchemaAction()
                             {
+                                Id = "3",
                                 Content = "Категория создана!",
                                 Type = MessageType.sendMessage
                             },
@@ -259,26 +291,31 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 CustomMethod = ExpenseCategoryActions.SendExpenseCategoriesList,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 CustomMethod = ExpenseCategoryActions.SelectCategory,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "3",
                                 Content = "Введите новое название категории",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
+                                Id = "4",
                                 CustomMethod = ExpenseCategoryActions.EditExpenseCategory,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "5",
                                 Content = "Категория изменена",
                                 Type = MessageType.sendMessage
                             }
@@ -291,21 +328,25 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 CustomMethod = ExpenseCategoryActions.SendExpenseCategoriesList,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 CustomMethod = ExpenseCategoryActions.SelectCategory,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "3",
                                 CustomMethod = ExpenseCategoryActions.DeleteExpenseCategory,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "4",
                                 Content = "Категория удалена",
                                 Type = MessageType.sendMessage
                             }
@@ -318,6 +359,7 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 Content = "Что именно настроим?",
                                 Type = MessageType.sendMessage
                             },
@@ -330,21 +372,25 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 Content = "Скопируй ссылку на файл в GoogleSheets, где ты будешь хранить расходы.",
                                 Type = MessageType.sendMessage
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 CustomMethod = GoogleAuthActions.SetSpreadsheet,
                                 Type = MessageType.saveUserInput
                             },
                             new SchemaAction()
                             {
+                                Id = "3",
                                 CustomMethod = GoogleAuthActions.SendSheetsListForSelect,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "4",
                                 //PropertySetter = v => ((DomainDataContext)Chat.DataContext).Expenses.CurrentObject.Category = v,
                                 CustomMethod = GoogleAuthActions.SetSheet,
                                 Type = MessageType.saveUserInput
@@ -358,16 +404,19 @@ namespace ExpenseTrackingBot
                         {
                             new SchemaAction()
                             {
+                                Id = "1",
                                 CustomMethod = GoogleAuthActions.RemoveGoogleAuthorization,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "2",
                                 CustomMethod=GoogleAuthActions.AuthorizeAndGetSheetsService,
                                 Type = MessageType.Custom
                             },
                             new SchemaAction()
                             {
+                                Id = "3",
                                 Content = "Авторизация прошла успешно!",
                                 Type = MessageType.sendMessage
                             },

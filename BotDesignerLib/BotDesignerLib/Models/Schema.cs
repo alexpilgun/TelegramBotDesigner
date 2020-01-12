@@ -2,77 +2,62 @@
 using System.Collections.Generic;
 using System.Text;
 using Telegram.Bot;
-using LiteDB;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BotDesignerLib
 {
-    [Serializable]
     public class Schema
     {
-        public string Id { get; }
-        [BsonIgnore]
-        public Chat Chat;
-        public List<SchemaStep> Steps {get;set;}
-
-        public Schema()
-        {
-            Id = Guid.NewGuid().ToString("N");
-        }
+        public string Name { get; set; }
+        public virtual List<SchemaStep> Steps {get;set;}
+        public List<SchemaActionBlock> Blocks { get; set; }
+        public Schema() { }
     }
-    [Serializable]
+
     public class SchemaStep
     {
         // ToDo: merge SchemaStep and Transition
-        public string Id { get; }
         public SchemaActionBlock FromBlock { get; set; }
         public SchemaActionBlock ToBlock { get; set; }
         public Transition Transition { get; set; }
 
         public SchemaStep()
         {
-            Id = Guid.NewGuid().ToString("N");
+
         }
     }
-    [Serializable]
+
     public class SchemaActionBlock
     {
-        public string Id { get; }
         public string Name { get; set; }
         public List<SchemaAction> Messages { get; set; }
 
-        public SchemaActionBlock()
-        {
-            Id = Guid.NewGuid().ToString("N");
-        }
+        public SchemaActionBlock() { }
     }
-    [Serializable]
+ 
     public class SchemaAction
     {
-        public string Id { get; }
+        public string Id { get; set; }
         public string Content { get; set; }
-        public Func<string, string> TextWithProperties { get; set; }
-        public Action<string> PropertySetter { get; set; }
+        public Func<Chat, string> TextWithProperties { get; set; }
+        public Action<Chat, string> PropertySetter { get; set; }
         public Func<string, Chat, TelegramBotClient, LibActionResult> CustomMethod {get;set; }
         public MessageType Type { get; set; }
         public string ErrorHandlingMessage { get; set; }
 
-        public SchemaAction()
-        {
-            Id = Guid.NewGuid().ToString("N");
-        }
+        public SchemaAction() { }
     }
 
     [Serializable]
     public class Transition
     {
-        public string Id { get; }
         public string Name { get; set; }
         public string DisplayName { get; set; }
         public bool IsDefault { get; set; }
 
         public Transition()
         {
-            Id = Guid.NewGuid().ToString("N");
             IsDefault = false;
         }
 

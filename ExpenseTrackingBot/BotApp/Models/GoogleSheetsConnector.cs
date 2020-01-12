@@ -8,6 +8,9 @@ using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace ExpenseTrackingBot
 {
@@ -21,12 +24,19 @@ namespace ExpenseTrackingBot
 
     public class GoogleSheetsConnector
     {
-        public string ChatId { get; }
+        [Key]
+        public string ChatId { get; set; }
         public string SpreadsheetId { get; set; }
         public string Sheetname { get; set; }
         public int? SheetId { get; set; }
+        [NotMapped]
         public UserCredential UserCredential { get; set; }
+        [NotMapped]
         public SheetsService SheetsService { get; set; }
+        public virtual DomainDataContext DomainDataContext { get; set; }
+        public string DomainDataContextId { get; set; }
+
+        public GoogleSheetsConnector() { }
 
         public GoogleSheetsConnector(long chatId)
         {

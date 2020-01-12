@@ -18,16 +18,7 @@ namespace ExpenseTrackingBot
 
         static void Main(string[] args)
         {
-            string telegramBotAccessToken = System.IO.File.ReadAllText("C:\\Users\\sleep\\Documents\\TelegramBotDesignerRepos\\ExpenseTrackingBotCreds\\TelegramBotAccessToken.txt");
-
-            config = new LibConfigurationModule()
-            {
-                DbConnector = new DBConnector(@"LiteDBFile.db"),
-                BotClient = new TelegramBotClient(telegramBotAccessToken, new HttpToSocks5Proxy("127.0.0.1", 9054)),
-                DomainSchemaType = typeof(SchemaInstance),
-                DomainDataContextType = typeof(DomainDataContext)
-            };
-        
+            config = new LibInit().Config;
             var initializationStatus = config.BotClient.TestApiAsync().Result;
 
             config.BotClient.OnMessage += Bot_OnMessage;
@@ -37,7 +28,7 @@ namespace ExpenseTrackingBot
 
             while (true)
             {
-                Console.WriteLine(ChatStats.getReportOnCurrentChats(config.DbConnector));
+                Console.WriteLine(ChatStats.getReportOnCurrentChats(config));
                 Thread.Sleep(10000);
             }
         }

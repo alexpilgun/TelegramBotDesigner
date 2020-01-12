@@ -90,6 +90,17 @@ namespace ExpenseTrackingBot
                 };
             }
             
+            var r = AuthorizeAndGetSheetsService(userInput, chat, botClient);
+
+            if(r.Status == false)
+            {
+                return new LibActionResult()
+                {
+                    Status = false,
+                    ErrorMessage = "Не удалось авторизовать твой аккаунт у Гугла:("
+                };
+            }
+            
             try
             {
                 spr = connector.SheetsService.Spreadsheets.Get(spreadsheetIdCandidate).Execute();
@@ -113,8 +124,18 @@ namespace ExpenseTrackingBot
             var status = false;
             var messageText = "Выбери лист, на котором будут учитываться расходы";
 
+            var r = AuthorizeAndGetSheetsService(userInput, chat, botClient);
 
-           var sheetsList = connector.SheetsService.Spreadsheets.Get(connector.SpreadsheetId)
+            if (r.Status == false)
+            {
+                return new LibActionResult()
+                {
+                    Status = false,
+                    ErrorMessage = "Не удалось авторизовать твой аккаунт у Гугла:("
+                };
+            }
+
+            var sheetsList = connector.SheetsService.Spreadsheets.Get(connector.SpreadsheetId)
                 .Execute().Sheets;
 
             var buttonsList = new List<InlineKeyboardButton>();
@@ -137,13 +158,28 @@ namespace ExpenseTrackingBot
         public static LibActionResult SetSheet(string userInput, Chat chat, TelegramBotClient botClient)
         {
             var connector = ((DomainDataContext)chat.DataContext).GoogleSheetsConnector;
-
-            connector.SheetId = Convert.ToInt32(userInput);
-            if (connector.SheetId == null)
+            int sheetNum = -1;
+            if( Int32.TryParse(userInput, out sheetNum))
             {
-                return new LibActionResult() { 
+                connector.SheetId = sheetNum;
+            }
+            else
+            {
+                return new LibActionResult()
+                {
                     Status = false,
                     ErrorMessage = "Идентификатор листа должен быть числом"
+                };
+            }
+
+            var r = AuthorizeAndGetSheetsService(userInput, chat, botClient);
+
+            if (r.Status == false)
+            {
+                return new LibActionResult()
+                {
+                    Status = false,
+                    ErrorMessage = "Не удалось авторизовать твой аккаунт у Гугла:("
                 };
             }
 
@@ -152,13 +188,18 @@ namespace ExpenseTrackingBot
                 connector.Sheetname = connector.SheetsService.Spreadsheets.Get(connector.SpreadsheetId)
                 .Execute().Sheets.Where(x => x.Properties.SheetId == connector.SheetId).First().Properties.Title;
             }
-            catch (Google.GoogleApiException e)
+            catch (Exception e)
             {
-                return new LibActionResult()
+                string errMsg = null;
+                if(e is Google.GoogleApiException || e is InvalidOperationException)
                 {
-                    Status = false,
-                    ErrorMessage = "Не удалось найти такой лист."
-                };
+                    errMsg = "Не удалось найти такой лист.";
+                }
+                else
+                {
+                    errMsg = "Не удалось установить лист по неизвестной причине.";
+                }
+                return new LibActionResult() { Status = false, ErrorMessage = errMsg };
             }
             
             return new LibActionResult() { Status = true };

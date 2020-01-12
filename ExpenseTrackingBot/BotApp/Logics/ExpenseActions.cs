@@ -5,6 +5,7 @@ using System.Linq;
 using BotDesignerLib;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTrackingBot
 {
@@ -15,7 +16,7 @@ namespace ExpenseTrackingBot
             bool status = false;
             if (Decimal.TryParse(userInput, out decimal val))
             {
-                ((DomainDataContext)chat.DataContext).Expenses.CurrentObject.ExpenseValue = val;
+                ((DomainDataContext)chat.DataContext).CurrentExpense.ExpenseValue = val;
                 status = true;
             }
             
@@ -24,7 +25,7 @@ namespace ExpenseTrackingBot
 
         public static LibActionResult SetExpenseCategory(string userInput, Chat chat, TelegramBotClient botClient)
         {
-            var expenseCategories = ((DomainDataContext)chat.DataContext).ExpenseCategories.Objects;
+            var expenseCategories = ((DomainDataContext)chat.DataContext).ExpenseCategories;
             var selectedCategory = expenseCategories.Where(x => x.Name == userInput).FirstOrDefault();
             
             if(selectedCategory == null)
@@ -32,7 +33,7 @@ namespace ExpenseTrackingBot
                 return new LibActionResult { Status = false, ErrorMessage = "Категория не найдена" };
             }
 
-            ((DomainDataContext)chat.DataContext).Expenses.CurrentObject.Category = selectedCategory;
+            ((DomainDataContext)chat.DataContext).CurrentExpense.Category = selectedCategory;
 
             return new LibActionResult() { Status = true };
         }
@@ -40,8 +41,8 @@ namespace ExpenseTrackingBot
         public static LibActionResult PrintExpense(string userInput, Chat chat, TelegramBotClient botClient)
         {
             string messageText = String.Format("{0} - {1}",
-            ((DomainDataContext)chat.DataContext).Expenses.CurrentObject.Category.Name,
-            ((DomainDataContext)chat.DataContext).Expenses.CurrentObject.ExpenseValue
+            ((DomainDataContext)chat.DataContext).CurrentExpense.Category.Name,
+            ((DomainDataContext)chat.DataContext).CurrentExpense.ExpenseValue
             );
             var status = TelegramActions.sendMessage(chat.СhatId, messageText, null, botClient);
 
@@ -51,7 +52,22 @@ namespace ExpenseTrackingBot
         public static LibActionResult SetNewCurrentExpense(string userInput, Chat chat, TelegramBotClient botClient)
         {
             //var newExpense = new Expense();
-            ((DomainDataContext)chat.DataContext).Expenses.CurrentObject = new Expense();
+            ((DomainDataContext)chat.DataContext).CurrentExpense = new Expense();
+            return new LibActionResult() { Status = true };
+        }
+
+        public static LibActionResult DeleteCurrentExpense(string userInput, Chat chat, TelegramBotClient botClient)
+        {
+            using (var ctx = new AppDbContext())
+            {
+                var currentExpense = ((DomainDataContext)chat.DataContext).CurrentExpense;
+                ctx.Remove(currentExpense);
+                ctx.SaveChanges();
+            }
+
+            //((DomainDataContext)chat.DataContext).Expenses.Remove();
+            //((DomainDataContext)chat.DataContext).CurrentExpense = null;
+
             return new LibActionResult() { Status = true };
         }
     }

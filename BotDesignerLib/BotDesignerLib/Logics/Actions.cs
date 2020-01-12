@@ -77,13 +77,13 @@ namespace BotDesignerLib
 
     public static class LibActions
     {
-        public static bool SetDataContextProperty(string UserInput, Action<string> propertySetter)
+        public static bool SetDataContextProperty(Chat CurrentChat, string UserInput, Action<Chat, string> propertySetter)
         {
             if(!String.IsNullOrEmpty(UserInput))
             {
                 
             }
-            propertySetter(UserInput);
+            propertySetter(CurrentChat, UserInput);
             return true;
         }
 
@@ -99,7 +99,7 @@ namespace BotDesignerLib
     public class LibActionInput
     {
         public string userInput { get; set; }
-        public IDataContext chatDataContext { get; set; }
+        public DataContext chatDataContext { get; set; }
         public LibActionInput() { }
     }
 
